@@ -5,6 +5,7 @@ __pycache__/
 
 # editor
 .idea/
+.vs/
 
 # C extensions
 *.so
