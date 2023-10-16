@@ -1,11 +1,18 @@
+import os
+import urllib
+import traceback
+import time
+import sys
 import numpy as np
 import cv2
-from rknnlite.api import RKNNLite
+from rknn.api import RKNN
 
+# Model from https://github.com/airockchip/rknn_model_zoo
+ONNX_MODEL = 'yolov5n.onnx'
 RKNN_MODEL = 'yolov5n.rknn'
-
 IMG_PATH = './bus.jpg'
-# DATASET = './dataset.txt'
+DATASET = './dataset.txt'
+
 QUANTIZE_ON = True
 
 OBJ_THRESH = 0.25
@@ -20,9 +27,6 @@ CLASSES = ("person", "bicycle", "car", "motorbike ", "aeroplane ", "bus ", "trai
            "pottedplant", "bed", "diningtable", "toilet ", "tvmonitor", "laptop	", "mouse	", "remote ", "keyboard ", "cell phone", "microwave ",
            "oven ", "toaster", "sink", "refrigerator ", "book", "clock", "vase", "scissors ", "teddy bear ", "hair drier", "toothbrush ")
 
-# 激活函数
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
 
 
 def xywh2xyxy(x):
@@ -40,13 +44,12 @@ def process(input, mask, anchors):
     anchors = [anchors[i] for i in mask]
     grid_h, grid_w = map(int, input.shape[0:2])
 
-    # 将input的结果用激活函数处理
-    box_confidence = sigmoid(input[..., 4])
+    box_confidence = input[..., 4]
     box_confidence = np.expand_dims(box_confidence, axis=-1)
 
-    box_class_probs = sigmoid(input[..., 5:])
+    box_class_probs = input[..., 5:]
 
-    box_xy = sigmoid(input[..., :2])*2 - 0.5
+    box_xy = input[..., :2]*2 - 0.5
 
     col = np.tile(np.arange(0, grid_w), grid_w).reshape(-1, grid_w)
     row = np.tile(np.arange(0, grid_h).reshape(-1, 1), grid_h)
@@ -56,7 +59,7 @@ def process(input, mask, anchors):
     box_xy += grid
     box_xy *= int(IMG_SIZE/grid_h)
 
-    box_wh = pow(sigmoid(input[..., 2:4])*2, 2)
+    box_wh = pow(input[..., 2:4]*2, 2)
     box_wh = box_wh * anchors
 
     box = np.concatenate((box_xy, box_wh), axis=-1)
@@ -231,18 +234,43 @@ def letterbox(im, new_shape=(640, 640), color=(0, 0, 0)):
 if __name__ == '__main__':
 
     # Create RKNN object
-    rknn = RKNNLite()
+    rknn = RKNN(verbose=True)
 
-    # load RKNN model
-    print('--> Load RKNN model')
-    ret = rknn.load_rknn(RKNN_MODEL)
+    """ 执行模型转换开始 """
+    # pre-process config
+    print('--> Config model')
+    rknn.config(mean_values=[[0, 0, 0]], std_values=[[255, 255, 255]], target_platform='rk3588')
+    print('done')
 
+    # Load ONNX model
+    print('--> Loading model')
+    ret = rknn.load_onnx(model=ONNX_MODEL)
+    if ret != 0:
+        print('Load model failed!')
+        exit(ret)
+    print('done')
 
+    # Build model
+    print('--> Building model')
+    ret = rknn.build(do_quantization=QUANTIZE_ON, dataset=DATASET)
+    if ret != 0:
+        print('Build model failed!')
+        exit(ret)
+    print('done')
+
+    # Export RKNN model
+    print('--> Export rknn model')
+    ret = rknn.export_rknn(RKNN_MODEL)
+    if ret != 0:
+        print('Export rknn model failed!')
+        exit(ret)
+    print('done')
+
+    """ 执行模型转换结束 """
+    
     # Init runtime environment
-    # 配置runtime
     print('--> Init runtime environment')
-    ret = rknn.init_runtime(core_mask=RKNNLite.NPU_CORE_0_1_2)  #使用0 1 2三个NPU核心
-    # ret = rknn.init_runtime('rk3566')
+    ret = rknn.init_runtime()
     if ret != 0:
         print('Init runtime environment failed!')
         exit(ret)
@@ -257,7 +285,10 @@ if __name__ == '__main__':
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
-
+    np.save('./onnx_yolov5_0.npy', outputs[0])
+    np.save('./onnx_yolov5_1.npy', outputs[1])
+    np.save('./onnx_yolov5_2.npy', outputs[2])
+    print('done')
 
     # post process
     input0_data = outputs[0]
@@ -278,9 +309,6 @@ if __name__ == '__main__':
     img_1 = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     if boxes is not None:
         draw(img_1, boxes, scores, classes)
-    # show output
-    cv2.imshow("post process result", img_1)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        cv2.imwrite('result.jpg', img_1)
 
     rknn.release()
