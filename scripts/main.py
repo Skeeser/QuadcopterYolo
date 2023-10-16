@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from rknnlite.api import RKNNLite
 
-RKNN_MODEL = '../models/yolov5n_sample.rknn'
+RKNN_MODEL = '../models/yolov5s.rknn'
 
 IMG_PATH = '../dataset/bus.jpg'
 # DATASET = './dataset.txt'
