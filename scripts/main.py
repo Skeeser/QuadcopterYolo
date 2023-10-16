@@ -2,9 +2,9 @@ import numpy as np
 import cv2
 from rknnlite.api import RKNNLite
 
-RKNN_MODEL = 'yolov5n.rknn'
+RKNN_MODEL = '../models/yolov5n_sample.rknn'
 
-IMG_PATH = './bus.jpg'
+IMG_PATH = '../dataset/bus.jpg'
 # DATASET = './dataset.txt'
 QUANTIZE_ON = True
 
@@ -279,8 +279,9 @@ if __name__ == '__main__':
     if boxes is not None:
         draw(img_1, boxes, scores, classes)
     # show output
-    cv2.imshow("post process result", img_1)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.imwrite("../output/test.jpg", img_1)
+    # cv2.imshow("post process result", img_1)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     rknn.release()
