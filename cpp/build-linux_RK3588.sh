@@ -1,11 +1,14 @@
 set -e
 
-TARGET_SOC="rk3588"
-GCC_COMPILER=aarch64-linux-gnu
+# 此脚本用作交叉编译用
 
-export LD_LIBRARY_PATH=${TOOL_CHAIN}/lib64:$LD_LIBRARY_PATH
-export CC=${GCC_COMPILER}-gcc
-export CXX=${GCC_COMPILER}-g++
+TARGET_SOC="rk3588"
+# GCC_COMPILER=aarch64-linux-gnu
+# export TOOL_CHAIN=/此处填写下载的交叉编译工具链
+
+# export LD_LIBRARY_PATH=${TOOL_CHAIN}/lib64:$LD_LIBRARY_PATH
+# export CC=${GCC_COMPILER}-gcc
+# export CXX=${GCC_COMPILER}-g++
 
 ROOT_PWD=$( cd "$( dirname $0 )" && cd -P "$( dirname "$SOURCE" )" && pwd )
 

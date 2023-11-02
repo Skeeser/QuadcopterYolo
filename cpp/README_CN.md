@@ -14,43 +14,6 @@
 5. 由于硬件限制，该demo的模型默认把 yolov5 模型的后处理部分，移至cpu实现。本demo附带的模型均使用relu为激活函数，相比silu激活函数精度略微下降，性能大幅上升。
 
 
-
-## Android Demo
-
-### 编译
-
-根据指定平台修改 `build-android_<TARGET_PLATFORM>.sh`中的Android NDK的路径 `ANDROID_NDK_PATH`，<TARGET_PLATFORM>可以是RK3566_RK3568, RK3562或RK3588 例如修改成：
-
-```sh
-ANDROID_NDK_PATH=~/opt/tool_chain/android-ndk-r17
-```
-
-然后执行：
-
-```sh
-./build-android_<TARGET_PLATFORM>.sh
-```
-
-### 推送执行文件到板子
-
-连接板子的usb口到PC,将整个demo目录到 `/data`:
-
-```sh
-adb root
-adb remount
-adb push install/rknn_yolov5_demo /data/
-```
-
-### 运行
-
-```sh
-adb shell
-cd /data/rknn_yolov5_demo/
-
-export LD_LIBRARY_PATH=./lib
-./rknn_yolov5_demo model/<TARGET_PLATFORM>/yolov5s-640-640.rknn model/bus.jpg
-```
-
 ## Aarch64 Linux Demo
 
 ### 编译

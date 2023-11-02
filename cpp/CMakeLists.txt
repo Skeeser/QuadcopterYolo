@@ -128,6 +128,7 @@ if(MPP_LIBS)
   )
 endif()
 
+
 # install target and libraries
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install/rknn_yolov5_demo_${CMAKE_SYSTEM_NAME})
 install(TARGETS rknn_yolov5_demo DESTINATION ./)
