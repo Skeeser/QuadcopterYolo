@@ -1,23 +1,33 @@
 # QuadcopterYolo
 无人机的识别系统
 
+<br>
 
 ## 功能特性
 1. 通过瑞芯微的ai加速npu来实现硬件的加速
-2. 
-
-## 文件结构(可选)
-<!-- 可以描述下文件的结构 -->
+2. 实现识别跟踪功能
 
 
+## 文件结构
+- assets => 资源文件
+- doc => 存放开发相关文档
+- model => 存放模型
+- include => 头文件
+- cpp => cpp代码
+- pythom => python代码
+- README.md => 项目说明
+
+<br>
 
 ## 硬件开发板
 orangepi5
 
-
+<br>
 
 ## 软件的系统环境
 ubuntu22.04
+
+<br>
 
 ## 快速开始
 
@@ -26,7 +36,7 @@ ubuntu22.04
 - docker
 - python3.8
 
-
+<br>
 
 ### 构建
 
@@ -45,6 +55,8 @@ ubuntu22.04
 
 keeser
 
+<br>
+
 ## TODO
 - [x] 初步部署
 - [ ] 写硬件优化算法OpenRGA
@@ -59,6 +71,7 @@ keeser
 - [ ] 转换模型并推理
 - [ ] 通过公网或者局域网实时发送推理结果
 
+<br>
 
 ## 许可证
 MPL 2.0
